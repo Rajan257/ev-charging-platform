@@ -1,0 +1,117 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Rules
+rule_files: []
+
+# Scrape configs for all EV Roaming Hub services
+scrape_configs:
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # ── Existing services ──────────────────────────────────
+  - job_name: 'api-gateway'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['api-gateway:8000']
+        labels: { service: 'api-gateway' }
+
+  - job_name: 'auth-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['auth-service:8081']
+        labels: { service: 'auth-service' }
+
+  - job_name: 'station-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['station-service:8082']
+        labels: { service: 'station-service' }
+
+  - job_name: 'session-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['session-service:8083']
+        labels: { service: 'session-service' }
+
+  - job_name: 'billing-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['billing-service:8084']
+        labels: { service: 'billing-service' }
+
+  - job_name: 'payment-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['payment-service:8085']
+        labels: { service: 'payment-service' }
+
+  - job_name: 'roaming-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['roaming-service:8086']
+        labels: { service: 'roaming-service' }
+
+  - job_name: 'settlement-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['settlement-service:8087']
+        labels: { service: 'settlement-service' }
+
+  - job_name: 'notification-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['notification-service:8088']
+        labels: { service: 'notification-service' }
+
+  # ── New extended services ──────────────────────────────
+  - job_name: 'device-management-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['device-management-service:8090']
+        labels: { service: 'device-management-service' }
+
+  - job_name: 'smart-charging-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['smart-charging-service:8091']
+        labels: { service: 'smart-charging-service' }
+
+  - job_name: 'fleet-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['fleet-service:8092']
+        labels: { service: 'fleet-service' }
+
+  - job_name: 'analytics-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['analytics-service:8093']
+        labels: { service: 'analytics-service' }
+
+  - job_name: 'route-planning-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['route-planning-service:8094']
+        labels: { service: 'route-planning-service' }
+
+  - job_name: 'fraud-detection-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['fraud-detection-service:8095']
+        labels: { service: 'fraud-detection-service' }
+
+  - job_name: 'energy-reporting-service'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['energy-reporting-service:8096']
+        labels: { service: 'energy-reporting-service' }

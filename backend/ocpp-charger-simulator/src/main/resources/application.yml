@@ -1,0 +1,12 @@
+server:
+  port: 8098
+spring:
+  application:
+    name: ocpp-charger-simulator
+ocpp:
+  server-url: ws://localhost:8082/ocpp
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus

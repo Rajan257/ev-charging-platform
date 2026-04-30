@@ -1,0 +1,371 @@
+version: '3.9'
+
+# =============================================================
+# EV Roaming Hub India — Extended Docker Compose
+# Adds: 8 new microservices + observability stack + ClickHouse
+# + Schema Registry + HashiCorp Vault + ML service
+# =============================================================
+# Usage: docker-compose -f docker-compose.yml -f docker-compose-extended.yml up -d
+# =============================================================
+
+networks:
+  ev-network:
+    external: true   # uses the network defined in base compose
+
+volumes:
+  prometheus_data:
+  grafana_data:
+  elasticsearch_data:
+  clickhouse_data:
+  vault_data:
+
+services:
+
+  # ===================== OBSERVABILITY =====================
+
+  prometheus:
+    image: prom/prometheus:v2.50.0
+    container_name: ev-prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    networks:
+      - ev-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--tries=1", "--spider", "http://localhost:9090/-/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  grafana:
+    image: grafana/grafana:10.3.3
+    container_name: ev-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: evroaming123
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/ev-overview.json
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - ev-network
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.55
+    container_name: ev-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"   # Jaeger UI
+      - "4317:4317"     # OTLP gRPC
+      - "4318:4318"     # OTLP HTTP
+    networks:
+      - ev-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--tries=1", "--spider", "http://localhost:16686"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  elasticsearch:
+    image: elasticsearch:8.12.1
+    container_name: ev-elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      "ES_JAVA_OPTS": "-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - ev-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health | grep -v '\"status\":\"red\"'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  logstash:
+    image: logstash:8.12.1
+    container_name: ev-logstash
+    volumes:
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    ports:
+      - "5044:5044"   # Logstash input (Beats)
+      - "5001:5001"   # TCP JSON input from services
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - ev-network
+
+  kibana:
+    image: kibana:8.12.1
+    container_name: ev-kibana
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - ev-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:5601/api/status | grep -v '\"level\":\"critical\"'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ===================== ANALYTICS DB =====================
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.2
+    container_name: ev-clickhouse
+    environment:
+      CLICKHOUSE_DB: evanalytics
+      CLICKHOUSE_USER: evroaming
+      CLICKHOUSE_PASSWORD: evroaming_secret
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    ports:
+      - "8123:8123"   # HTTP interface
+      - "9009:9000"   # Native protocol
+    networks:
+      - ev-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8123/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ===================== SCHEMA REGISTRY =====================
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.6.0
+    container_name: ev-schema-registry
+    depends_on:
+      - kafka
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:9092
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8089
+    ports:
+      - "8089:8089"
+    networks:
+      - ev-network
+
+  # ===================== SECRETS MANAGEMENT =====================
+
+  vault:
+    image: hashicorp/vault:1.15.6
+    container_name: ev-vault
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ev-roaming-hub-root-token
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+      VAULT_ADDR: http://0.0.0.0:8200
+    command: server -dev
+    ports:
+      - "8200:8200"
+    volumes:
+      - vault_data:/vault/data
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - ev-network
+    healthcheck:
+      test: ["CMD", "vault", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ===================== NEW MICROSERVICES =====================
+
+  device-management-service:
+    build:
+      context: ../backend/device-management-service
+      dockerfile: Dockerfile
+    container_name: ev-device-management
+    ports:
+      - "8090:8090"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/evroaming_device
+      SPRING_DATASOURCE_USERNAME: evroaming
+      SPRING_DATASOURCE_PASSWORD: evroaming_secret
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/ev-roaming-hub
+      MANAGEMENT_OTLP_TRACING_ENDPOINT: http://jaeger:4318/v1/traces
+    depends_on:
+      - postgres
+      - kafka
+      - redis
+    networks:
+      - ev-network
+
+  smart-charging-service:
+    build:
+      context: ../backend/smart-charging-service
+      dockerfile: Dockerfile
+    container_name: ev-smart-charging
+    ports:
+      - "8091:8091"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/evroaming_smartcharging
+      SPRING_DATASOURCE_USERNAME: evroaming
+      SPRING_DATASOURCE_PASSWORD: evroaming_secret
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/ev-roaming-hub
+    depends_on:
+      - postgres
+      - kafka
+      - redis
+    networks:
+      - ev-network
+
+  fleet-service:
+    build:
+      context: ../backend/fleet-service
+      dockerfile: Dockerfile
+    container_name: ev-fleet-service
+    ports:
+      - "8092:8092"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/evroaming_fleet
+      SPRING_DATASOURCE_USERNAME: evroaming
+      SPRING_DATASOURCE_PASSWORD: evroaming_secret
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/ev-roaming-hub
+    depends_on:
+      - postgres
+      - kafka
+    networks:
+      - ev-network
+
+  analytics-service:
+    build:
+      context: ../backend/analytics-service
+      dockerfile: Dockerfile
+    container_name: ev-analytics-service
+    ports:
+      - "8093:8093"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/evroaming_analytics
+      SPRING_DATASOURCE_USERNAME: evroaming
+      SPRING_DATASOURCE_PASSWORD: evroaming_secret
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      CLICKHOUSE_URL: jdbc:clickhouse://clickhouse:8123/evanalytics
+      CLICKHOUSE_USERNAME: evroaming
+      CLICKHOUSE_PASSWORD: evroaming_secret
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/ev-roaming-hub
+    depends_on:
+      - postgres
+      - kafka
+      - clickhouse
+    networks:
+      - ev-network
+
+  route-planning-service:
+    build:
+      context: ../backend/route-planning-service
+      dockerfile: Dockerfile
+    container_name: ev-route-planning
+    ports:
+      - "8094:8094"
+    environment:
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/ev-roaming-hub
+    depends_on:
+      - redis
+    networks:
+      - ev-network
+
+  fraud-detection-service:
+    build:
+      context: ../backend/fraud-detection-service
+      dockerfile: Dockerfile
+    container_name: ev-fraud-detection
+    ports:
+      - "8095:8095"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/evroaming_fraud
+      SPRING_DATASOURCE_USERNAME: evroaming
+      SPRING_DATASOURCE_PASSWORD: evroaming_secret
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/ev-roaming-hub
+    depends_on:
+      - postgres
+      - kafka
+      - redis
+    networks:
+      - ev-network
+
+  energy-reporting-service:
+    build:
+      context: ../backend/energy-reporting-service
+      dockerfile: Dockerfile
+    container_name: ev-energy-reporting
+    ports:
+      - "8096:8096"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/evroaming_energy
+      SPRING_DATASOURCE_USERNAME: evroaming
+      SPRING_DATASOURCE_PASSWORD: evroaming_secret
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/ev-roaming-hub
+    depends_on:
+      - postgres
+      - kafka
+    networks:
+      - ev-network
+
+  ml-service:
+    build:
+      context: ../ml-service
+      dockerfile: Dockerfile
+    container_name: ev-ml-service
+    ports:
+      - "8097:8097"
+    networks:
+      - ev-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8097/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  ocpp-charger-simulator:
+    build:
+      context: ../backend/ocpp-charger-simulator
+      dockerfile: Dockerfile
+    container_name: ev-ocpp-simulator
+    ports:
+      - "8098:8098"
+    environment:
+      OCPP_SERVER_URL: ws://station-service:8082/ocpp
+    depends_on:
+      - station-service
+    networks:
+      - ev-network
+    profiles:
+      - simulation   # only starts with: docker-compose --profile simulation up

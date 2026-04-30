@@ -1,0 +1,22 @@
+server:
+  port: 8094
+spring:
+  application:
+    name: route-planning-service
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/ev-roaming-hub
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+route:
+  station-service-url: http://localhost:8082
+  nominatim-url: https://nominatim.openstreetmap.org

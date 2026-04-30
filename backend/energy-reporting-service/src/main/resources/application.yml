@@ -1,0 +1,36 @@
+server:
+  port: 8096
+spring:
+  application:
+    name: energy-reporting-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/evroaming_energy
+    username: evroaming
+    password: evroaming_secret
+  jpa:
+    hibernate.ddl-auto: validate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: energy-reporting-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/ev-roaming-hub
+energy:
+  carbon:
+    emission-factor-kg-per-kwh: 0.82  # CEA 2023 India grid
+  gst:
+    cgst-rate: 9.0
+    sgst-rate: 9.0
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus

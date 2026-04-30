@@ -1,0 +1,33 @@
+server:
+  port: 8092
+spring:
+  application:
+    name: fleet-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/evroaming_fleet
+    username: evroaming
+    password: evroaming_secret
+  jpa:
+    hibernate.ddl-auto: validate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: fleet-billing-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/ev-roaming-hub
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus

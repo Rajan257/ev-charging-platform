@@ -1,0 +1,31 @@
+server:
+  port: 8093
+spring:
+  application:
+    name: analytics-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/evroaming_analytics
+    username: evroaming
+    password: evroaming_secret
+  jpa:
+    hibernate.ddl-auto: validate
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: analytics-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/ev-roaming-hub
+clickhouse:
+  url: jdbc:clickhouse://localhost:8123/evanalytics
+  username: evroaming
+  password: evroaming_secret
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
