@@ -46,7 +46,7 @@ public class SessionEventConsumer {
                     .sessionId(UUID.fromString(sessionId))
                     .userId(UUID.fromString(userId))
                     .energyKwh(energyKwh)
-                    .durationMinutes(durationMinutes)
+                    .durationMinutes((double) durationMinutes)
                     .sessionStartedAt(start)
                     .sessionStoppedAt(stop)
                     .tariffId(defaultTariffId)

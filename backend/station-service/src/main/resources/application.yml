@@ -35,11 +35,12 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
 
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:8080/realms/ev-roaming-hub
+  # DEV MODE: JWT validation disabled (see SecurityConfig)
+  # security:
+  #   oauth2:
+  #     resourceserver:
+  #       jwt:
+  #         issuer-uri: http://localhost:8080/realms/ev-roaming-hub
 
 # OCPP Configuration
 ocpp:

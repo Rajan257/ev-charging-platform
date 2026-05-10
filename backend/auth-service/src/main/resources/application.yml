@@ -40,12 +40,13 @@ spring:
       properties:
         spring.json.add.type.headers: false
 
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:8080/realms/ev-roaming-hub
-          jwk-set-uri: http://localhost:8080/realms/ev-roaming-hub/protocol/openid-connect/certs
+  # DEV MODE: JWT validation disabled (see SecurityConfig)
+  # security:
+  #   oauth2:
+  #     resourceserver:
+  #       jwt:
+  #         issuer-uri: http://localhost:8080/realms/ev-roaming-hub
+  #         jwk-set-uri: http://localhost:8080/realms/ev-roaming-hub/protocol/openid-connect/certs
 
   mail:
     host: smtp.gmail.com

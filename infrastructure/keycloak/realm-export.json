@@ -1,0 +1,114 @@
+{
+  "realm": "ev-roaming-hub",
+  "displayName": "EV Roaming Hub India",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "accessTokenLifespan": 900,
+  "refreshTokenMaxReuse": 0,
+  "roles": {
+    "realm": [
+      { "name": "USER", "composite": false },
+      { "name": "OPERATOR", "composite": false },
+      { "name": "ADMIN", "composite": false },
+      { "name": "CPO", "composite": false }
+    ]
+  },
+  "defaultRoles": ["USER"],
+  "clients": [
+    {
+      "clientId": "ev-frontend",
+      "name": "EV Roaming Hub Frontend",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": [
+        "http://localhost:3000/*",
+        "http://localhost:5173/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000",
+        "http://localhost:5173"
+      ],
+      "protocol": "openid-connect",
+      "attributes": {
+        "access.token.lifespan": "900",
+        "refresh.token.lifespan": "86400"
+      }
+    },
+    {
+      "clientId": "ev-backend",
+      "name": "EV Roaming Hub Backend Services",
+      "enabled": true,
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "secret": "ev-backend-secret-dev-2024",
+      "protocol": "openid-connect"
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@evroaminghub.in",
+      "firstName": "EV",
+      "lastName": "Admin",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["USER", "ADMIN"]
+    },
+    {
+      "username": "operator1",
+      "email": "operator@evroaminghub.in",
+      "firstName": "Station",
+      "lastName": "Operator",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Operator@123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["USER", "OPERATOR"]
+    },
+    {
+      "username": "driver1",
+      "email": "driver@evroaminghub.in",
+      "firstName": "EV",
+      "lastName": "Driver",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Driver@123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["USER"]
+    }
+  ],
+  "smtpServer": {
+    "host": "localhost",
+    "port": "1025",
+    "from": "noreply@evroaminghub.in",
+    "fromDisplayName": "EV Roaming Hub"
+  }
+}

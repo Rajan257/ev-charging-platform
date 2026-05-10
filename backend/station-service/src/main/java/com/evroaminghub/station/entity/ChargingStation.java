@@ -38,10 +38,10 @@ public class ChargingStation {
     @Column(nullable = false)
     private String pincode;
 
-    @Column(nullable = false, precision = 10, scale = 8)
+    @Column(nullable = false)
     private Double latitude;
 
-    @Column(nullable = false, precision = 11, scale = 8)
+    @Column(nullable = false)
     private Double longitude;
 
     @Column(name = "location_type")

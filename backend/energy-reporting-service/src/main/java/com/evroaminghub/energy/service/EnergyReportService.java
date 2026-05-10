@@ -59,19 +59,19 @@ public class EnergyReportService {
         double igst    = 0.0;   // inter-state if applicable
         double totalTax = cgst + sgst + igst;
 
-        return Map.of(
-            "period", String.format("%04d-%02d", year, month),
-            "currency", "INR",
-            "subtotal", subtotal,
-            "cgst9pct", Math.round(cgst * 100.0) / 100.0,
-            "sgst9pct", Math.round(sgst * 100.0) / 100.0,
-            "igst", igst,
-            "totalTaxCollected", Math.round(totalTax * 100.0) / 100.0,
-            "grossRevenue", Math.round((subtotal + totalTax) * 100.0) / 100.0,
-            "gstFilingRequired", true,
-            "gstinForFiling", "29AABCU9603R1ZX",
-            "generatedAt", Instant.now().toString()
-        );
+        Map<String, Object> map = new java.util.LinkedHashMap<>();
+        map.put("period", String.format("%04d-%02d", year, month));
+        map.put("currency", "INR");
+        map.put("subtotal", subtotal);
+        map.put("cgst9pct", Math.round(cgst * 100.0) / 100.0);
+        map.put("sgst9pct", Math.round(sgst * 100.0) / 100.0);
+        map.put("igst", igst);
+        map.put("totalTaxCollected", Math.round(totalTax * 100.0) / 100.0);
+        map.put("grossRevenue", Math.round((subtotal + totalTax) * 100.0) / 100.0);
+        map.put("gstFilingRequired", true);
+        map.put("gstinForFiling", "29AABCU9603R1ZX");
+        map.put("generatedAt", Instant.now().toString());
+        return map;
     }
 
     public Map<String, Object> getGridUsageReport(String from, String to) {
@@ -89,20 +89,20 @@ public class EnergyReportService {
     }
 
     public Map<String, Object> getComplianceReport(int year, int month) {
-        return Map.of(
-            "period", String.format("%04d-%02d", year, month),
-            "regulatoryBody", "CERC / State DISCOM",
-            "totalStationsReporting", 127,
-            "totalEnergyKwh", 12450.5,
-            "totalSessions", 554,
-            "avgAvailabilityPct", 96.8,
-            "faultIncidents", 3,
-            "resolvedIncidents", 3,
-            "openIncidents", 0,
-            "complianceStatus", "COMPLIANT",
-            "reportingStandard", "MNRE EV Charging Infrastructure Guidelines 2023",
-            "generatedAt", Instant.now().toString()
-        );
+        Map<String, Object> map = new java.util.LinkedHashMap<>();
+        map.put("period", String.format("%04d-%02d", year, month));
+        map.put("regulatoryBody", "CERC / State DISCOM");
+        map.put("totalStationsReporting", 127);
+        map.put("totalEnergyKwh", 12450.5);
+        map.put("totalSessions", 554);
+        map.put("avgAvailabilityPct", 96.8);
+        map.put("faultIncidents", 3);
+        map.put("resolvedIncidents", 3);
+        map.put("openIncidents", 0);
+        map.put("complianceStatus", "COMPLIANT");
+        map.put("reportingStandard", "MNRE EV Charging Infrastructure Guidelines 2023");
+        map.put("generatedAt", Instant.now().toString());
+        return map;
     }
 
     private Map<String, String> buildPeriod(String from, String to) {

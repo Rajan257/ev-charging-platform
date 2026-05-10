@@ -149,15 +149,15 @@ services:
     environment:
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/ev-roaming-hub
       SPRING_DATA_REDIS_HOST: redis
-      SPRING_CLOUD_GATEWAY_ROUTES_0_URI: http://auth-service:8081
-      SPRING_CLOUD_GATEWAY_ROUTES_1_URI: http://station-service:8082
-      SPRING_CLOUD_GATEWAY_ROUTES_2_URI: ws://station-service:8082
-      SPRING_CLOUD_GATEWAY_ROUTES_3_URI: http://session-service:8083
-      SPRING_CLOUD_GATEWAY_ROUTES_4_URI: http://billing-service:8084
-      SPRING_CLOUD_GATEWAY_ROUTES_5_URI: http://payment-service:8085
-      SPRING_CLOUD_GATEWAY_ROUTES_6_URI: http://roaming-service:8086
-      SPRING_CLOUD_GATEWAY_ROUTES_7_URI: http://settlement-service:8087
-      SPRING_CLOUD_GATEWAY_ROUTES_8_URI: http://notification-service:8088
+      AUTH_SERVICE_URL: http://auth-service:8081
+      STATION_SERVICE_URL: http://station-service:8082
+      OCPP_WEBSOCKET_URL: ws://station-service:8082
+      SESSION_SERVICE_URL: http://session-service:8083
+      BILLING_SERVICE_URL: http://billing-service:8084
+      PAYMENT_SERVICE_URL: http://payment-service:8085
+      ROAMING_SERVICE_URL: http://roaming-service:8086
+      SETTLEMENT_SERVICE_URL: http://settlement-service:8087
+      NOTIFICATION_SERVICE_URL: http://notification-service:8088
     depends_on:
       - keycloak
       - redis
@@ -348,7 +348,7 @@ services:
       dockerfile: Dockerfile
     container_name: ev-frontend
     ports:
-      - "3000:80"
+      - "3001:80"
     environment:
       VITE_API_BASE_URL: http://localhost:8000
       VITE_KEYCLOAK_URL: http://localhost:8080

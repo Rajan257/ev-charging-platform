@@ -6,7 +6,6 @@ import com.evroaminghub.auth.entity.UserRole;
 import com.evroaminghub.auth.exception.DuplicateResourceException;
 import com.evroaminghub.auth.exception.ResourceNotFoundException;
 import com.evroaminghub.auth.repository.UserRepository;
-import com.evroaminghub.auth.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -22,7 +21,6 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final WalletRepository walletRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final KafkaTemplate<String, Object> kafkaTemplate;

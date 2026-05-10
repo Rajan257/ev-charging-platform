@@ -67,7 +67,7 @@ public class BillingService {
         if (request.isCrossState()) {
             igst = gstAmount;
         } else {
-            cgst = gstAmount.divide(BigDecimal.TWO, 2, RoundingMode.HALF_UP);
+            cgst = gstAmount.divide(BigDecimal.valueOf(2), 2, RoundingMode.HALF_UP);
             sgst = gstAmount.subtract(cgst);
         }
 
