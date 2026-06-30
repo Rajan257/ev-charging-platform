@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { type AxiosResponse } from 'axios'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, MapPin, Filter, Zap, Navigation, X, Wifi } from 'lucide-react'
+import { Search, MapPin, Navigation, X, Wifi } from 'lucide-react'
 import { stationApi } from '../services/api'
 import { useNavigate } from 'react-router-dom'
 import 'leaflet/dist/leaflet.css'
 
-// Sample stations fallback for when API is not running
+// Sample stations fallback for when API is not running or down
 const SAMPLE_STATIONS = [
   { id: 's001', name: 'Tata Power - Connaught Place', city: 'New Delhi', state: 'Delhi',
     latitude: 28.6315, longitude: 77.2167, status: 'AVAILABLE', cpoNetworkCode: 'TATA',
@@ -44,7 +44,7 @@ const SAMPLE_STATIONS = [
 
 const networkColors: Record<string, string> = {
   TATA: '#00D1FF', ATHER: '#39FF14', BPCL: '#FFA500',
-  CHGZ: '#A855F7', FORT: '#FF6B6B',
+  CHGZ: '#A855F7', FORT: '#FF6B6B', STAT: '#F472B6',
 }
 
 function createStationIcon(status: string, code: string) {
@@ -59,11 +59,12 @@ function createStationIcon(status: string, code: string) {
       width: 36px; height: 36px; border-radius: 50%;
       background: ${color}25; border: 2px solid ${color};
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px; cursor: pointer;
+      font-size: 14px; font-weight: bold; cursor: pointer;
       box-shadow: 0 0 12px ${color}60;
       transition: transform 0.2s;
+      color: ${color};
     " onmouseenter="this.style.transform='scale(1.2)'" onmouseleave="this.style.transform='scale(1)'">
-      ⚡
+      E
     </div>`,
     iconSize: [36, 36],
     iconAnchor: [18, 18],
@@ -88,7 +89,6 @@ export default function MapPage() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  // Try to load from API
   useEffect(() => {
     setLoading(true)
     stationApi.getStations({ size: 100 })
@@ -228,7 +228,7 @@ export default function MapPage() {
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='© OpenStreetMap contributors'
+            attribution='&copy; OpenStreetMap contributors'
           />
           <MapController center={mapCenter} />
           {filtered.map(station => (
@@ -299,7 +299,7 @@ export default function MapPage() {
                     onClick={() => navigate(`/stations/${selected.id}`)}
                     className="btn-charge px-6 py-2.5 text-sm"
                   >
-                    <Zap size={16} /> Charge
+                    Charge
                   </button>
                 )}
               </div>

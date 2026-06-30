@@ -1,0 +1,27 @@
+{
+  "u-1782835141084": {
+    "balance": 698.6,
+    "currency": "INR",
+    "history": [
+      {
+        "id": "txn-1782835329962",
+        "type": "DEBIT",
+        "amount": 1.4,
+        "description": "Charging payment for Transaction TXNDZJ9DKXN",
+        "createdAt": "2026-06-30T16:02:09.962Z"
+      },
+      {
+        "id": "txn-1782835203309",
+        "type": "TOPUP",
+        "amount": 200,
+        "description": "Prepaid Wallet Top-up via UPI",
+        "createdAt": "2026-06-30T16:00:03.310Z"
+      }
+    ]
+  },
+  "u-1782835619376": {
+    "balance": 500,
+    "currency": "INR",
+    "history": []
+  }
+}

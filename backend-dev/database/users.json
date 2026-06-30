@@ -1,0 +1,18 @@
+{
+  "rajan@evroaming.com": {
+    "id": "u-1782835141084",
+    "email": "rajan@evroaming.com",
+    "fullName": "Rajan Rai",
+    "phone": "",
+    "password": "Password123",
+    "role": "DRIVER"
+  },
+  "aarav@mehta.com": {
+    "id": "u-1782835619376",
+    "email": "aarav@mehta.com",
+    "fullName": "Aarav Mehta",
+    "phone": "",
+    "password": "Pass12345",
+    "role": "DRIVER"
+  }
+}

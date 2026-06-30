@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { type AxiosResponse } from 'axios'
 import { motion } from 'framer-motion'
 import { Wallet, CreditCard, Plus, ArrowUpRight, ArrowDownLeft, Clock, Download } from 'lucide-react'
 import { billingApi, paymentApi } from '../services/api'
+import { type AxiosResponse } from 'axios'
 import toast from 'react-hot-toast'
 
 const SAMPLE_INVOICES = [
@@ -37,13 +37,13 @@ export default function PaymentsPage() {
 
   const handleTopUp = async () => {
     const amount = parseFloat(topUpAmt)
-    if (!amount || amount < 100) { toast.error('Minimum top-up ₹100'); return }
+    if (!amount || amount < 100) { toast.error('Minimum top-up Rs.100'); return }
     setTopUpLoading(true)
     try {
       const res = await paymentApi.topUpWallet({ amount, paymentMethod: 'UPI' })
       setWallet(res.data)
       setTopUpAmt('')
-      toast.success(`₹${amount} added to wallet!`)
+      toast.success(`Rs.${amount} added to wallet!`)
     } catch { toast.error('Top-up failed') }
     setTopUpLoading(false)
   }

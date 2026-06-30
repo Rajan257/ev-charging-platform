@@ -1,10 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Zap, MapPin, Shield, Globe, ChevronRight, Battery, Wifi, CreditCard } from 'lucide-react'
+import { MapPin, Shield, Globe, ChevronRight, Battery, Wifi, CreditCard, Network } from 'lucide-react'
 
 const features = [
   {
-    icon: Zap,
+    icon: Network,
     title: 'Multi-Network Access',
     description: 'Charge at Tata Power, Ather Grid, BPCL Pulse, ChargeZone, and 50+ networks with one account.',
     color: '#00D1FF',
@@ -57,10 +57,7 @@ export default function LandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                 style={{ background: 'linear-gradient(135deg, #00D1FF, #39FF14)' }}>
-              <Zap size={16} className="text-dark-900" />
-            </div>
+            <img src="/logo.png" alt="EV Roaming Hub Logo" className="w-8 h-8 object-contain rounded-lg flex-shrink-0" />
             <span className="font-display font-bold text-lg text-gradient">EV Roaming Hub</span>
           </div>
           <div className="flex items-center gap-3">
@@ -104,17 +101,16 @@ export default function LandingPage() {
 
             {/* Subheading */}
             <p className="text-white/60 text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-              One account. Any network. Instant payment. 
-              Connect to Tata Power, Ather Grid, BPCL, ChargeZone & more — seamlessly.
+              One account. Any network. Instant payment.
+              Connect to Tata Power, Ather Grid, BPCL, ChargeZone and more, seamlessly.
             </p>
 
             {/* CTA Buttons */}
             <div className="flex items-center justify-center gap-4 flex-wrap">
               <button
                 onClick={() => navigate('/register')}
-                className="btn-primary px-8 py-4 text-base"
+                className="btn-primary py-3.5 px-8 text-base justify-center w-full sm:w-auto"
               >
-                <Zap size={20} />
                 Start Charging Free
               </button>
               <button
@@ -138,13 +134,13 @@ export default function LandingPage() {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="text-white/40 text-xs uppercase tracking-widest mb-1">Live Session</p>
-                  <p className="font-display font-bold text-xl">Ather Grid — Koramangala</p>
+                  <p className="font-display font-bold text-xl">Ather Grid - Koramangala</p>
                 </div>
                 <span className="badge-available"><span className="live-dot" />Charging</span>
               </div>
               <div className="grid grid-cols-3 gap-4">
                 {[
-                  { label: 'Energy', value: '12.4 kWh', icon: '⚡' },
+                  { label: 'Energy', value: '12.4 kWh', icon: '🔌' },
                   { label: 'Cost', value: '₹173.60', icon: '💳' },
                   { label: 'SoC', value: '78%', icon: '🔋' },
                 ].map((stat) => (
@@ -252,9 +248,8 @@ export default function LandingPage() {
           <p className="text-white/60 mb-8">Join thousands of EV drivers on India's unified charging network.</p>
           <button
             onClick={() => navigate('/register')}
-            className="btn-charge px-10 py-4 text-lg"
+            className="btn-charge py-3.5 px-8 text-base justify-center w-full sm:w-auto"
           >
-            <Zap size={22} />
             Create Free Account
           </button>
         </div>
@@ -264,10 +259,7 @@ export default function LandingPage() {
       <footer className="border-t border-white/5 py-10 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded flex items-center justify-center"
-                 style={{ background: 'linear-gradient(135deg, #00D1FF, #39FF14)' }}>
-              <Zap size={12} className="text-dark-900" />
-            </div>
+            <img src="/logo.png" alt="EV Roaming Hub Logo" className="w-6 h-6 object-contain rounded flex-shrink-0" />
             <span className="font-display font-bold text-sm text-gradient">EV Roaming Hub India</span>
           </div>
           <div className="flex gap-6 text-white/40 text-sm">
@@ -275,7 +267,7 @@ export default function LandingPage() {
             <span>OCPI 2.2.1 Ready</span>
             <span>GST Compliant</span>
           </div>
-          <p className="text-white/30 text-xs">© 2026 EV Roaming Hub India. Built with ⚡</p>
+          <p className="text-white/30 text-xs">© 2026 EV Roaming Hub India.</p>
         </div>
       </footer>
     </div>

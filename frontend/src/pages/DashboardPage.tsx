@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { useAuthStore } from '../store/authStore'
 import { sessionApi, billingApi, paymentApi } from '../services/api'
 import {
-  Zap, Clock, Battery, IndianRupee, TrendingUp, MapPin,
+  Clock, Battery, IndianRupee, TrendingUp, MapPin,
   CheckCircle, AlertCircle, Play, Square
 } from 'lucide-react'
 import {
@@ -106,7 +106,7 @@ export default function DashboardPage() {
         <div>
           <h1 className="font-display font-bold text-2xl">
             Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'},
-            {' '}{user?.fullName?.split(' ')[0]} ⚡
+            {' '}{user?.fullName?.split(' ')[0]}
           </h1>
           <p className="text-white/50 mt-0.5">Your EV charging dashboard</p>
         </div>
@@ -123,10 +123,10 @@ export default function DashboardPage() {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center"
                    style={{ background: 'rgba(57,255,20,0.15)', border: '1px solid rgba(57,255,20,0.3)' }}>
-                <Zap size={20} style={{ color: '#39FF14' }} />
+                <Battery size={20} style={{ color: '#39FF14' }} />
               </div>
               <div>
-                <p className="font-display font-bold text-lg">⚡ Charging in Progress</p>
+                <p className="font-display font-bold text-lg">Charging in Progress</p>
                 <p className="text-sm text-white/50">TX: {activeSession.transactionId}</p>
               </div>
             </div>
@@ -140,7 +140,7 @@ export default function DashboardPage() {
               { icon: Clock, label: 'Duration', value: formatTime(sessionTimer), color: '#00D1FF' },
               { icon: Battery, label: 'Energy', value: `${((sessionTimer / 3600) * 11).toFixed(1)} kWh`, color: '#39FF14' },
               { icon: IndianRupee, label: 'Est. Cost', value: `₹${((sessionTimer / 3600) * 11 * 14).toFixed(0)}`, color: '#FFA500' },
-              { icon: Zap, label: 'Power', value: '50 kW DC', color: '#A855F7' },
+              { icon: Battery, label: 'Power', value: '50 kW DC', color: '#A855F7' },
             ].map(({ icon: Icon, label, value, color }) => (
               <div key={label} className="bg-dark-700/50 rounded-xl p-4 text-center">
                 <Icon size={20} className="mx-auto mb-2" style={{ color }} />
@@ -188,7 +188,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           {
-            icon: Zap, label: 'Total Energy', value: `${totalKwh.toFixed(1)} kWh`,
+            icon: Battery, label: 'Total Energy', value: `${totalKwh.toFixed(1)} kWh`,
             sub: `${completedSessions} sessions`, color: '#00D1FF',
             bg: 'rgba(0,209,255,0.08)'
           },
@@ -271,7 +271,7 @@ export default function DashboardPage() {
         </div>
         {history.length === 0 ? (
           <div className="text-center py-12 text-white/30">
-            <Zap size={40} className="mx-auto mb-3 opacity-30" />
+            <Battery size={40} className="mx-auto mb-3 opacity-30" />
             <p>No charging sessions yet.</p>
             <a href="/map" className="btn-primary inline-flex mt-4">Find a Station</a>
           </div>

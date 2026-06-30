@@ -1,0 +1,15 @@
+[
+  {
+    "id": "sess-1782835297998",
+    "transactionId": "TXNDZJ9DKXN",
+    "status": "COMPLETED",
+    "startedAt": "2026-06-30T16:01:37.998Z",
+    "stationId": "s003",
+    "stationName": "Ather Grid - Koramangala",
+    "connectorId": "c003a",
+    "energyKwh": 0.1,
+    "totalAmount": 1.4,
+    "userId": "u-1782835141084",
+    "stoppedAt": "2026-06-30T16:02:09.960Z"
+  }
+]

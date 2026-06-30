@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { type AxiosResponse } from 'axios'
-import { MapPin, Phone, Clock, Zap, Wifi, ArrowLeft, Battery } from 'lucide-react'
+import { MapPin, Phone, Clock, Wifi, ArrowLeft, Battery, IndianRupee } from 'lucide-react'
 import { stationApi, sessionApi } from '../services/api'
 import { useAuthStore } from '../store/authStore'
 import toast from 'react-hot-toast'
@@ -10,7 +10,7 @@ import toast from 'react-hot-toast'
 // Fallback station data
 const FALLBACK: Record<string, any> = {
   's003': {
-    id: 's003', name: 'Ather Grid — Koramangala', address: '7th Block, Koramangala, Bengaluru',
+    id: 's003', name: 'Ather Grid - Koramangala', address: '7th Block, Koramangala, Bengaluru',
     city: 'Bengaluru', state: 'Karnataka', pincode: '560095',
     latitude: 12.9352, longitude: 77.6245, status: 'AVAILABLE',
     cpoNetworkName: 'Ather Grid', cpoNetworkCode: 'ATHER', phone: '+91-80-4567-8901',
@@ -27,6 +27,11 @@ const FALLBACK: Record<string, any> = {
 
 const connectorColors: Record<string, string> = {
   CCS2: '#00D1FF', TYPE2: '#A855F7', CHADEMO: '#FFA500', BHARAT_AC: '#39FF14'
+}
+
+const networkColors: Record<string, string> = {
+  TATA: '#00D1FF', ATHER: '#39FF14', BPCL: '#FFA500',
+  CHGZ: '#A855F7', FORT: '#FF6B6B', STAT: '#F472B6',
 }
 
 export default function StationDetailPage() {
@@ -54,7 +59,7 @@ export default function StationDetailPage() {
         stationId: station.id,
         authMethod: 'APP',
       })
-      toast.success('⚡ Charging session started!')
+      toast.success('Charging session started!')
       navigate('/dashboard')
     } catch (err: any) {
       const msg = err.response?.data?.detail || 'Failed to start session'
@@ -76,6 +81,8 @@ export default function StationDetailPage() {
 
   if (!station) return null
 
+  const networkColor = networkColors[station.cpoNetworkCode] || '#00D1FF'
+
   return (
     <div className="p-6 max-w-4xl mx-auto animate-fade-in">
       {/* Back */}
@@ -90,19 +97,18 @@ export default function StationDetailPage() {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <div className="w-3 h-3 rounded-full"
-                   style={{ background: '#00D1FF', boxShadow: '0 0 8px #00D1FF' }} />
-              <span className="text-sm text-white/50">{station.cpoNetworkName}</span>
+                   style={{ background: networkColor, boxShadow: `0 0 8px ${networkColor}` }} />
+              <span className="text-sm font-medium" style={{ color: networkColor }}>{station.cpoNetworkName}</span>
             </div>
             <h1 className="font-display font-bold text-2xl mb-1">{station.name}</h1>
             <p className="text-white/50 flex items-center gap-1.5">
               <MapPin size={14} />
-              {station.address}, {station.city} — {station.pincode}
+              {station.address || `${station.city}, ${station.state}`}
             </p>
           </div>
           <span className={
             station.status === 'AVAILABLE' ? 'badge-available text-base px-4 py-2'
-            : station.status === 'BUSY' ? 'badge-busy text-base px-4 py-2'
-            : 'badge-offline text-base px-4 py-2'
+            : station.status === 'BUSY' ? 'badge-busy text-base px-4 py-2' : 'badge-offline text-base px-4 py-2'
           }>
             {station.status}
           </span>
@@ -139,14 +145,10 @@ export default function StationDetailPage() {
             >
               <div className="flex items-start justify-between gap-2 mb-4">
                 <div>
-                  <div className={`text-lg font-bold font-mono mb-1
-                                  ${c.standard === 'CCS2' ? 'connector-ccs2'
-                                    : c.standard === 'TYPE2' ? 'connector-type2'
-                                    : c.standard === 'CHADEMO' ? 'connector-chademo'
-                                    : 'connector-bharat'}`}>
+                  <div className="text-xl font-bold font-mono mb-1" style={{ color }}>
                     {c.standard}
                   </div>
-                  <p className="text-xs text-white/40">EVSE: {c.evseId}</p>
+                  <p className="text-xs text-white/40">EVSE: {c.evseId || c.id}</p>
                 </div>
                 <span className={isAvail ? 'badge-available' : c.status === 'OCCUPIED' ? 'badge-busy' : 'badge-offline'}>
                   {c.status}
@@ -154,27 +156,22 @@ export default function StationDetailPage() {
               </div>
 
               <div className="grid grid-cols-3 gap-3 mb-4">
-                <div className="text-center">
-                  <div className="font-bold text-lg" style={{ color }}>{c.maxVoltage}V</div>
-                  <div className="text-xs text-white/40">Voltage</div>
+                <div className="text-center bg-dark-700/50 rounded-xl p-2">
+                  <div className="font-bold text-base" style={{ color }}>{c.maxVoltage}V</div>
+                  <div className="text-[10px] text-white/40">Voltage</div>
                 </div>
-                <div className="text-center">
-                  <div className="font-bold text-lg" style={{ color }}>{c.maxAmperage}A</div>
-                  <div className="text-xs text-white/40">Amperage</div>
+                <div className="text-center bg-dark-700/50 rounded-xl p-2">
+                  <div className="font-bold text-base" style={{ color }}>{c.maxAmperage}A</div>
+                  <div className="text-[10px] text-white/40">Amperage</div>
                 </div>
-                <div className="text-center">
-                  <div className="font-bold text-lg" style={{ color }}>
+                <div className="text-center bg-dark-700/50 rounded-xl p-2">
+                  <div className="font-bold text-base" style={{ color }}>
                     {c.maxElectricPower >= 1000
                       ? `${(c.maxElectricPower / 1000).toFixed(0)} kW`
                       : `${c.maxElectricPower} W`}
                   </div>
-                  <div className="text-xs text-white/40">Max Power</div>
+                  <div className="text-[10px] text-white/40">Max Power</div>
                 </div>
-              </div>
-
-              <div className="flex items-center justify-between mb-3 text-xs text-white/30">
-                <span>{c.powerType?.replace('_', ' ')}</span>
-                <span>Connector #{c.connectorNumber}</span>
               </div>
 
               {isAvail ? (
@@ -190,12 +187,12 @@ export default function StationDetailPage() {
                       Starting...
                     </span>
                   ) : (
-                    <><Zap size={16} /> Start Charging</>
+                    <>Start Charging</>
                   )}
                 </button>
               ) : (
                 <button disabled className="w-full py-3 rounded-xl bg-dark-600 text-white/30 text-sm cursor-not-allowed">
-                  {c.status === 'OCCUPIED' ? '⚡ In Use' : '× Not Available'}
+                  {c.status === 'OCCUPIED' ? 'In Use' : 'Not Available'}
                 </button>
               )}
             </motion.div>
@@ -203,7 +200,7 @@ export default function StationDetailPage() {
         })}
       </div>
 
-      {/* Tariff info placeholder */}
+      {/* Tariff info */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -211,13 +208,13 @@ export default function StationDetailPage() {
         className="glass-card p-5 mt-6"
       >
         <h3 className="font-display font-semibold mb-3 flex items-center gap-2">
-          <Battery size={18} className="text-primary-400" /> Pricing
+          <IndianRupee size={18} className="text-primary-400" /> Pricing
         </h3>
         <div className="grid sm:grid-cols-3 gap-4 text-center">
           {[
-            { label: 'Energy', value: '₹14/kWh (DC)' },
-            { label: 'Idle Fee',  value: '₹2/min (>15 min)' },
-            { label: 'GST',  value: '18% (included)' },
+            { label: 'Energy Rate', value: `Rs.${station.tariffPerKwh ?? 14}/kWh` },
+            { label: 'Idle Fee', value: 'Rs.2/min (after 15 min)' },
+            { label: 'GST', value: '18% included' },
           ].map(p => (
             <div key={p.label} className="bg-dark-700/50 rounded-xl p-3">
               <div className="text-ev-charge font-bold">{p.value}</div>
