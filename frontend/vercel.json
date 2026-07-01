@@ -4,7 +4,11 @@
   "rewrites": [
     {
       "source": "/api/v1/:path*",
-      "destination": "https://ev-charging-backend.onrender.com/api/v1/:path*"
+      "destination": "https://ev-charging-platform-iz4z.onrender.com/api/v1/:path*"
+    },
+    {
+      "source": "/ocpi/:path*",
+      "destination": "https://ev-charging-platform-iz4z.onrender.com/ocpi/:path*"
     },
     {
       "source": "/(.*)",
